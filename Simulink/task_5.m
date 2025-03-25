@@ -10,20 +10,17 @@ Lb = 1;
 Ig_w = 0.02;       
 Ig_u = 20;         
 R = 0.127;         
-g = 9.81;            
-
-Ft = 5;  
-beta = -0.18;  % realistic
-theta = -0.35; % realistic
+g = 9.81;              
 
 % Derived constants
-C1 = M + Ig_w/R^2 + Mu;
+C1 = M + Ig_w/(R^2) + Mu;
 C2 = Mu * Lg;
 C5 = Mu * Lg;
 C4 = Mu * Lg^2 + Ig_u;
 
 % 2) Range of Ft values
-Ft_values = 10:0.5:25;
+beta = -0.18;
+Ft_values = 0:10:10000;
 results = [];
 
 % 3) Loop over Ft and run the model
@@ -49,17 +46,15 @@ for currentFt = Ft_values
     tipping_idx = find(abs(theta_vals) >= tip_threshold, 1);
 
     if ~isempty(tipping_idx)
-        % Capture x just before tipping happens
         final_x = x(tipping_idx - 1);
         max_theta = max(abs(theta_vals(1:tipping_idx-1)));
     else
-        % If no tipping, capture at end of simulation
         final_x = x(end);
         max_theta = max(abs(theta_vals));
     end
 
     % Filter out absurd values (e.g., runaway simulations)
-    if final_x < 100 && max_theta < tip_threshold
+    if final_x < 10 && max_theta < tip_threshold && final_x > 0
         results = [results; currentFt, final_x, max_theta];
     end
 end
