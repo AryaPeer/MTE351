@@ -56,12 +56,8 @@ function transporterParamSweep()
     % Also assign the "default" Ft and beta if the model needs them in general:
     assignin('base','Ft',   Ft);
     assignin('base','beta', beta);
-
-    %% --- 1) Define the parameter grids to test ---
-    % Note: If you truly want a step of 50, use 0 : 50 : 2000; 
-    % but here your code says 0 : 10 : 2000 (step of 10).
-    timeValues = [5, 10];       % Different StopTimes to try
-    betaValues = [-0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
+    timeValues = [10];   
+    betaValues = [-0.7, -0.5, -0.3, -0.1, 0, 0.1, 0.3, 0.5, 0.7];
     ftValues   = 20 : 0.01 : 100;  
 
     %% --- 2) Allocate storage for results ---
