@@ -6,12 +6,6 @@ function transporterParamSweep_parallel()
     % 3) Records the final X distance before tipping (or the end of sim).
     % 4) Displays results where 5 <= finalX <= 10.
     % 5) Prints the total # of loops and the current loop # during execution.
-    %
-    % Make sure your Simulink model is named "human_transpoter_systemModel"
-    % and logs 'simout' (x) and 'simout1' (theta).
-    %
-    % Usage:
-    %   >> transporterParamSweep_parallel
 
     clc;
     clear;
@@ -27,11 +21,9 @@ function transporterParamSweep_parallel()
     R    = 0.127;
     g    = 9.81;
 
-    % Nominal thrust force & lean angle
     Ft   = 500;  
     beta = -0.18;
 
-    % Derived constants
     C1 = M + (Ig_w / R^2) + Mu;
     C2 = Mu * Lg;
     C4 = Mu * Lg^2 + Ig_u;
@@ -39,32 +31,27 @@ function transporterParamSweep_parallel()
 
     %% --- 2) Sweep definitions ---
     timeValues = [10];
-    betaValues = [-0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    ftValues   = 20 : 0.001 : 100;  % 20 to 100 in steps of 0.01
+    betaValues = [-0.3, -0.2, -0.1, 0, 0.1];
+    ftValues   = 20 : 0.001 : 100;
 
-    % All combinations in an ND-grid
     [T, B, F] = ndgrid(timeValues, betaValues, ftValues);
     combos    = [T(:), B(:), F(:)];
     numRuns   = size(combos, 1);
 
-    % Display how many loops we're going to run:
     fprintf('\nNumber of loops (simulations) to run: %d\n', numRuns);
 
     %% --- 3) Preallocate results ---
-    % We'll store [StopTime, Beta, Ft, FinalX, TippedFlag]
     results = zeros(numRuns, 5);
 
-    %% --- 4) Initialize or start parallel pool ---
+    %% --- 4) Parallel setup ---
     if isempty(gcp('nocreate'))
-        parpool;  % start a pool with default settings
+        parpool;
     end
 
-    % Create a DataQueue so we can display progress from inside parfor
     D = parallel.pool.DataQueue;
-    % This callback runs each time we call "send(D, i)" inside parfor
     afterEach(D, @(i) fprintf('Currently on iteration %d of %d\n', i, numRuns));
 
-    %% --- 5) Run parallel simulations ---
+    %% --- 5) Run simulations in parallel ---
     parfor i = 1 : numRuns
         Tsim    = combos(i,1);
         betaVal = combos(i,2);
@@ -75,23 +62,25 @@ function transporterParamSweep_parallel()
                                             C1, C2, C4, C5);
 
         results(i,:) = [Tsim, betaVal, ftVal, finalX, tippedFlag];
-
-        % Notify the DataQueue of progress
         send(D, i);
     end
 
-    %% --- 6) Convert results to table and filter ---
+    %% --- 6) Convert to table and save ---
     varNames     = ["StopTime","Beta","Ft","FinalX","TippedFlag"];
     resultsTable = array2table(results, 'VariableNames', varNames);
 
-    % Filter to runs with FinalX between 5 and 10
+    save('transporterSweepResults_parallel.mat', 'resultsTable');
+    fprintf('\nSaved results to transporterSweepResults_parallel.mat\n');
+
+    %% --- 7) Filter for FinalX between 5 and 10
     maskGood = (resultsTable.FinalX >= 5) & (resultsTable.FinalX <= 10);
     goodRuns = resultsTable(maskGood, :);
     goodRuns = sortrows(goodRuns, "FinalX", "descend");
 
-    %% --- 7) Display final results ---
+    %% --- 8) Display filtered results ---
     fprintf('\n=== Runs achieving 5m to 10m final distance: ===\n');
     disp(goodRuns);
+
     if isempty(goodRuns)
         fprintf('No runs found with finalX between 5 and 10 m.\n');
     end
