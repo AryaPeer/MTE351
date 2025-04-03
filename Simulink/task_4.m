@@ -13,8 +13,8 @@ R = 0.127;
 g = 9.81;            
 
 % Thrust force is fixed but need to be found
-Ft = 1000;   % placeeholder value  
-beta = -0.18;
+Ft = 70.21;   % placeeholder value  
+beta = 0.07;
 
 %% Define Constants shown in the block diagram
 C1 = M + Ig_w/(R^2) + Mu;

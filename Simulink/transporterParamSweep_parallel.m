@@ -1,4 +1,4 @@
-function transporterParamSweep_parallel()
+                function transporterParamSweep_parallel()
     % transporterParamSweep_parallel.m
     %
     % 1) Defines parameter sweeps for StopTime, Beta, and Ft.
@@ -6,7 +6,7 @@ function transporterParamSweep_parallel()
     % 3) Records the final X distance before tipping (or the end of sim).
     % 4) Displays results where 5 <= finalX <= 10.
     % 5) Prints the total # of loops and the current loop # during execution.
-
+ 
     clc;
     clear;
 
@@ -31,8 +31,8 @@ function transporterParamSweep_parallel()
 
     %% --- 2) Sweep definitions ---
     timeValues = [10];
-    betaValues = [-0.3, -0.2, -0.1, 0, 0.1];
-    ftValues   = 20 : 0.001 : 100;
+    betaValues = 0 : 0.01: 0.8;
+    ftValues   = 65: 0.001 : 75;
 
     [T, B, F] = ndgrid(timeValues, betaValues, ftValues);
     combos    = [T(:), B(:), F(:)];
