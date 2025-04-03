@@ -1,0 +1,25 @@
+{
+	"dataFile":"HumanTransporter.data",
+	"columns":[
+	{
+		"name":"beta.F -",
+		"internalType":"double"
+	
+},
+	{
+		"name":"theta_i.F -",
+		"internalType":"double"
+	
+},
+	{
+		"name":"thrust.F -",
+		"internalType":"double"
+	
+},
+	{
+		"name":"base.x m",
+		"internalType":"double"
+	
+}
+	]
+}
