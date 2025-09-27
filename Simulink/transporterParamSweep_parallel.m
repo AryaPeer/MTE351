@@ -40,10 +40,9 @@
 
     fprintf('\nNumber of loops (simulations) to run: %d\n', numRuns);
 
-    %% --- 3) Preallocate results ---
     results = zeros(numRuns, 5);
 
-    %% --- 4) Parallel setup ---
+    %% --- 3) Parallel setup ---
     if isempty(gcp('nocreate'))
         parpool;
     end
@@ -51,7 +50,7 @@
     D = parallel.pool.DataQueue;
     afterEach(D, @(i) fprintf('Currently on iteration %d of %d\n', i, numRuns));
 
-    %% --- 5) Run simulations in parallel ---
+    %% --- 4) Run simulations in parallel ---
     parfor i = 1 : numRuns
         Tsim    = combos(i,1);
         betaVal = combos(i,2);
@@ -65,19 +64,19 @@
         send(D, i);
     end
 
-    %% --- 6) Convert to table and save ---
+    %% --- 5) Convert to table and save ---
     varNames     = ["StopTime","Beta","Ft","FinalX","TippedFlag"];
     resultsTable = array2table(results, 'VariableNames', varNames);
 
     save('transporterSweepResults_parallel.mat', 'resultsTable');
     fprintf('\nSaved results to transporterSweepResults_parallel.mat\n');
 
-    %% --- 7) Filter for FinalX between 5 and 10
+    %% --- 6) Filter for FinalX between 5 and 10
     maskGood = (resultsTable.FinalX >= 5) & (resultsTable.FinalX <= 10);
     goodRuns = resultsTable(maskGood, :);
     goodRuns = sortrows(goodRuns, "FinalX", "descend");
 
-    %% --- 8) Display filtered results ---
+    %% --- 7) Display filtered results ---
     fprintf('\n=== Runs achieving 5m to 10m final distance: ===\n');
     disp(goodRuns);
 
